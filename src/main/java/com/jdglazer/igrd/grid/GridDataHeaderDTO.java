@@ -1,8 +1,12 @@
 package com.jdglazer.igrd.grid;
 
+import java.io.Serializable;
+import java.util.HashMap;
 import java.util.Map;
 
-public class GridDataHeaderDTO {
+import com.jdglazer.igrd.IGRDCommonDTO;
+
+public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * type of index identifier used for segments
 	 */
@@ -55,7 +59,7 @@ public class GridDataHeaderDTO {
 	 * 
 	 * index of the line mapped to the offset position in the grid data
 	 */
-	private Map<Integer, Integer> lineStartPositions;
+	private Map<Integer, Integer> lineStartPositions = new HashMap<Integer, Integer>();
 	
 	/**
 	 * @return the minimumLatitude

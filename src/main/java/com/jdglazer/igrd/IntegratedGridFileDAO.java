@@ -4,27 +4,30 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 
+import com.jdglazer.igrd.grid.GridDataDAO;
+import com.jdglazer.igrd.line.LineDataDAO;
+import com.jdglazer.igrd.point.PointDataDAO;
 import com.jdglazer.igrd.utils.FileModel;
 
-public class IntegratedGridFile extends FileModel {
+public class IntegratedGridFileDAO extends FileModel {
 	
 	public static final int FILE_CODE = 12739; 
 	
-	private GridData gridData;
+	private GridDataDAO gridData;
 	
-	private LineData linearData;
+	private LineDataDAO linearData;
 	
-	private PointData pointData;
+	private PointDataDAO pointData;
 
-	public IntegratedGridFile( RandomAccessFile raf ) {
+	public IntegratedGridFileDAO( RandomAccessFile raf ) {
 		super( new RandomAccessFile[]{ raf } );
 	}
 	
-	public IntegratedGridFile( FileInputStream fis ) throws IOException {
+	public IntegratedGridFileDAO( FileInputStream fis ) throws IOException {
 		super ( new FileInputStream[]{ fis } );
-		gridData = new GridData();
-		linearData = new LineData();
-		pointData = new PointData();
+		gridData = new GridDataDAO();
+		linearData = new LineDataDAO();
+		pointData = new PointDataDAO();
 	}
 	
 	public long getFileLength() {
@@ -59,15 +62,15 @@ public class IntegratedGridFile extends FileModel {
 		return 16 <= getPointDataOffset( );
 	}
 	
-	public GridData getGridData() {
+	public GridDataDAO getGridData() {
 		return gridData;
 	}
 	
-	public LineData getLineData() {
+	public LineDataDAO getLineData() {
 		return linearData;
 	}
 	
-	public PointData getPointData() {
+	public PointDataDAO getPointData() {
 		return pointData;
 	}
 	

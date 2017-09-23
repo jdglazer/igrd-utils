@@ -1,10 +1,12 @@
 package com.jdglazer.igrd.grid;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
+import com.jdglazer.igrd.IGRDCommonDTO;
 import com.jdglazer.igrd.utils.GridSegmentShortOverflow;
 
-public class GridDataLineDTO {
+public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 	
 	public GridDataLineDTO( short indexType ) {
 		segmentIndexType = indexType <= 2 && indexType > 0 ? indexType : 2 ;
@@ -33,17 +35,17 @@ public class GridDataLineDTO {
 /**
  * overflow segments where short value was insufficient, grid line offset 12
  */
-	private ArrayList<GridSegmentShortOverflow> shortOverflows;
+	private ArrayList<GridSegmentShortOverflow> shortOverflows = new ArrayList<GridSegmentShortOverflow> ();
 	
 /**
  * The starting position in the grid line of each part
  */
-	private ArrayList<Integer> partStarts;
+	private ArrayList<Integer> partStarts = new ArrayList<Integer>();
 	
 /**
  * The actual part data
  */
-	private ArrayList<PartDTO> parts;
+	private ArrayList<PartDTO> parts = new ArrayList<PartDTO>();
 	
 	/**
 	 * @return the lineSize
@@ -144,7 +146,7 @@ public class GridDataLineDTO {
 	 */
 		private int segmentCount = 0;
 		
-		private ArrayList<SegmentDTO> segments;
+		private ArrayList<SegmentDTO> segments = new ArrayList<SegmentDTO>();
 
 		/**
 		 * @return the startLongitude
