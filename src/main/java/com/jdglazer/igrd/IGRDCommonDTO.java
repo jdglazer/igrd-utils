@@ -1,5 +1,10 @@
 package com.jdglazer.igrd;
 
-public class IGRDCommonDTO {
-
+public abstract class IGRDCommonDTO {
+	
+	protected Class childClass;
+	
+	protected IGRDCommonDTO( Class child ) {
+		childClass = child;
+	}
 }

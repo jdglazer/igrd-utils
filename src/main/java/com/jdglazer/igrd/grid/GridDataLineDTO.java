@@ -4,13 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import com.jdglazer.igrd.IGRDCommonDTO;
-import com.jdglazer.igrd.utils.GridSegmentShortOverflow;
+import com.jdglazer.igrd.utils.GridSegmentShortOverflowDTO;
 
 public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
-	
-	public GridDataLineDTO( short indexType ) {
-		segmentIndexType = indexType <= 2 && indexType > 0 ? indexType : 2 ;
-	}
 
 /**
  * subject to parent grid data setting
@@ -35,7 +31,7 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 /**
  * overflow segments where short value was insufficient, grid line offset 12
  */
-	private ArrayList<GridSegmentShortOverflow> shortOverflows = new ArrayList<GridSegmentShortOverflow> ();
+	private ArrayList<GridSegmentShortOverflowDTO> shortOverflows = new ArrayList<GridSegmentShortOverflowDTO> ();
 	
 /**
  * The starting position in the grid line of each part
@@ -46,6 +42,11 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
  * The actual part data
  */
 	private ArrayList<PartDTO> parts = new ArrayList<PartDTO>();
+	
+	public GridDataLineDTO( short indexType ) {
+		super(GridDataLineDTO.class);
+		segmentIndexType = indexType <= 2 && indexType > 0 ? indexType : 2 ;
+	}
 	
 	/**
 	 * @return the lineSize
@@ -112,20 +113,20 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 		this.segmentIndexType = segmentIndexType;
 	}
 
-	public ArrayList<GridSegmentShortOverflow> getShortOverflows() {
+	public ArrayList<GridSegmentShortOverflowDTO> getShortOverflows() {
 		return shortOverflows;
 	}
 
-	public void addShortOverflow( GridSegmentShortOverflow overflow ) {
+	public void addShortOverflow( GridSegmentShortOverflowDTO overflow ) {
 		this.shortOverflows.add( overflow );
 		shortOverflowCount++;
-		lineSize+= 6;
+		lineSize+= 10;
 		for( int i = 0; i < partStarts.size(); i++ ) {
-			partStarts.set(i, partStarts.get(i).intValue()+6 );
+			partStarts.set(i, partStarts.get(i)+10 );
 		}
 	}
 	
-	public GridSegmentShortOverflow getShortOverflow( int index ) {
+	public GridSegmentShortOverflowDTO getShortOverflow( int index ) {
 		return shortOverflows.get(index);
 	}
 	

@@ -20,6 +20,7 @@ public class LineDataRecordDTO extends IGRDCommonDTO implements Serializable  {
 	private ArrayList<short[]> points = new ArrayList<short[]>();
 	
 	public LineDataRecordDTO( double minLat, double maxLat, double minLon, double maxLon ){
+		super( LineDataRecordDTO.class );
 		minLat = this.minLat;
 		maxLat = this.maxLat;
 		minLon = this.minLon;
