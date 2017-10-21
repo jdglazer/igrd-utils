@@ -12,12 +12,18 @@ public class GridDataDTO extends IGRDCommonDTO implements Serializable {
 	private ArrayList<GridDataLineDTO> gridDataLines = new ArrayList<GridDataLineDTO>();
 	
 	
-	public GridDataDTO() {
+	public GridDataDTO( ) {
 		super(GridDataDTO.class);
 	}
 	
 	public void addGridLine( GridDataLineDTO gridDataLine ) {
 		gridDataLines.add( gridDataLine );
+	}
+	
+	public void addGridDataLines(ArrayList<GridDataLineDTO> lines ) {
+		for( GridDataLineDTO gdl: lines ) {
+			gridDataLines.add(gdl);
+		}
 	}
 	
 	public void setGridDataHeader( GridDataHeaderDTO gridDataHeader ) {
@@ -31,4 +37,9 @@ public class GridDataDTO extends IGRDCommonDTO implements Serializable {
 	public GridDataLineDTO getGridDataLine( int line ) {
 		return gridDataLines.get(line);
 	}
+	
+	public ArrayList<GridDataLineDTO> getGridDataLines() {
+		return gridDataLines;
+	}
+	
 }

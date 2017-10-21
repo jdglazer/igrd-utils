@@ -12,8 +12,8 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	 * type of index identifier used for segments
 	 */
 	
-	public static final int TYPE_BYTE = 1;
-	public static final int TYPE_SHORT = 2;
+	public static final short TYPE_BYTE = 1;
+	public static final short TYPE_SHORT = 2;
 	
 	/**
 	 * at grid data offset 0
@@ -182,7 +182,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 		this.lineStartPositions.put( new Integer( lineIndex ) , new Integer( lineOffset ) );
 	}
 	
-	public int getLineOffset( int lineIndex ) {
+	public Integer getLineOffset( int lineIndex ) {
 		return this.lineStartPositions.get( new Integer( lineIndex ) );
 	}
 	
@@ -198,7 +198,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 		int lineOffsetCount = this.lineStartPositions.size();
 		
 		for( int i = 0; i < lineOffsetCount; i++ ) {
-			if( this.lineStartPositions.get( new Integer( i ) ) == null )
+			if( this.lineStartPositions.get(  i  ) == null )
 				return false;
 		}
 		

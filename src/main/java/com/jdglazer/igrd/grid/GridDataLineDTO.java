@@ -98,7 +98,7 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 		this.parts.add( part );
 		numberParts++;
 		partStarts.add( lineSize );
-		lineSize += 16 + (4+segmentIndexType)*part.getSegmentCount();
+		lineSize += 16 + (2+segmentIndexType)*part.getSegmentCount();
 	}
 	
 	public PartDTO getPart( int index ) {
