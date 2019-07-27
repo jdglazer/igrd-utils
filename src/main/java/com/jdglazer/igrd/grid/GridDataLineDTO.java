@@ -1,6 +1,7 @@
 package com.jdglazer.igrd.grid;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import com.jdglazer.igrd.IGRDCommonDTO;
@@ -8,19 +9,19 @@ import com.jdglazer.igrd.utils.GridSegmentShortOverflowDTO;
 
 public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 
-/**
- * subject to parent grid data setting
- */
+	/**
+ 	* subject to parent grid data setting
+ 	*/
 	private short segmentIndexType;
 	
-/**
- * The size of the line in bytes, grid line offset 0
- */
+	/**
+	 * The size of the line in bytes, grid line offset 0
+	 */
 	private int lineSize = 12;
 	
-/**
- * The number of geographically separated parts in the line, grid line offset 4
- */
+	/**
+	 * The number of geographically separated parts in the line, grid line offset 4
+	 */
 	private int numberParts = 0;
 	
 /**
@@ -41,10 +42,10 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 /**
  * The actual part data
  */
-	private ArrayList<PartDTO> parts = new ArrayList<PartDTO>();
+	private ArrayList<GridDataLinePartDTO> parts = new ArrayList<GridDataLinePartDTO>();
 	
 	public GridDataLineDTO( short indexType ) {
-		super(GridDataLineDTO.class);
+		super();
 		segmentIndexType = indexType <= 2 && indexType > 0 ? indexType : 2 ;
 	}
 	
@@ -56,9 +57,9 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 	}
 
 	/**
-	 * @param lineSize the lineSize to set
+	 * @param lineSize the line size to set
 	 */
-	public void setLineSize(int lineSize) {
+	public synchronized void setLineSize(int lineSize) {
 		this.lineSize = lineSize;
 	}
 
@@ -72,7 +73,7 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param numberParts the numberParts to set
 	 */
-	public void setNumberParts(int numberParts) {
+	public synchronized void setNumberParts(int numberParts) {
 		this.numberParts = numberParts;
 	}
 
@@ -86,7 +87,7 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param shortOverflowCount the shortOverflowCount to set
 	 */
-	public void setShortOverflowCount(int shortOverflowCount) {
+	public synchronized void setShortOverflowCount(int shortOverflowCount) {
 		this.shortOverflowCount = shortOverflowCount;
 	}
 	
@@ -94,30 +95,30 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 	 * adds a part and updates part count, part start offset, and line byte length
 	 * @param part
 	 */
-	public void addPart( PartDTO part ) {
+	public synchronized void addPart( GridDataLinePartDTO part ) {
 		this.parts.add( part );
 		numberParts++;
 		partStarts.add( lineSize );
 		lineSize += 16 + (2+segmentIndexType)*part.getSegmentCount();
 	}
 	
-	public PartDTO getPart( int index ) {
+	public synchronized GridDataLinePartDTO getPart( int index ) {
 		return this.parts.get( index );
 	}
 
-	public short getSegmentIndexType() {
+	public synchronized short getSegmentIndexType() {
 		return segmentIndexType;
 	}
 
-	public void setSegmentIndexType(short segmentIndexType) {
+	public synchronized void setSegmentIndexType(short segmentIndexType) {
 		this.segmentIndexType = segmentIndexType;
 	}
 
-	public ArrayList<GridSegmentShortOverflowDTO> getShortOverflows() {
+	public synchronized ArrayList<GridSegmentShortOverflowDTO> getShortOverflows() {
 		return shortOverflows;
 	}
 
-	public void addShortOverflow( GridSegmentShortOverflowDTO overflow ) {
+	public synchronized void addShortOverflow( GridSegmentShortOverflowDTO overflow ) {
 		this.shortOverflows.add( overflow );
 		shortOverflowCount++;
 		lineSize+= 10;
@@ -126,116 +127,36 @@ public class GridDataLineDTO extends IGRDCommonDTO implements Serializable {
 		}
 	}
 	
-	public GridSegmentShortOverflowDTO getShortOverflow( int index ) {
+	public synchronized GridSegmentShortOverflowDTO getShortOverflow( int index ) {
 		return shortOverflows.get(index);
 	}
-	
-	public class PartDTO {
-		
-	/**
-	 * line -> part offset 0
-	 */
-		private float startLongitude;
-		
-	/**
-	 * line -> part offset 4
-	 */
-		private int pointCount = 0;
-		
-	/**
-	 * line -> part offset 8
-	 */
-		private int segmentCount = 0;
-		
-		private ArrayList<SegmentDTO> segments = new ArrayList<SegmentDTO>();
 
-		/**
-		 * @return the startLongitude
-		 */
-		public float getStartLongitude() {
-			return startLongitude;
-		}
-
-		/**
-		 * @param startLongitude the startLongitude to set
-		 */
-		public void setStartLongitude(float startLongitude) {
-			this.startLongitude = startLongitude;
-		}
-
-		/**
-		 * @return the pointCount
-		 */
-		public int getPointCount() {
-			return pointCount;
-		}
-
-		/**
-		 * @return the segmentCount
-		 */
-		public int getSegmentCount() {
-			return segmentCount;
+	@Override
+	public synchronized ByteBuffer getByteBuffer() {
+		ByteBuffer buffer = ByteBuffer.allocate(getByteSize());
+		
+		buffer.putInt(lineSize);
+		buffer.putInt(numberParts);
+		buffer.putInt(shortOverflowCount);
+		
+		for(GridSegmentShortOverflowDTO shortOverflow : shortOverflows) {
+			buffer.put(shortOverflow.getByteBuffer());
 		}
 		
-		/**
-		 * 
-		 */
-		public SegmentDTO getSegment( int index ) {
-			return segments.get( index );
+		for(int partStart : partStarts) {
+			buffer.putInt(partStart);
 		}
 		
-		/**
-		 * 
-		 * @param segment
-		 */
-		public void addSegment( SegmentDTO segment ) {
-			segments.add( segment );
-			pointCount += segment.getSegmentLength();
-			segmentCount++;
+		for(GridDataLinePartDTO part : parts) {
+			buffer.put(part.getByteBuffer());
 		}
 		
+		return null;
 	}
-	
-	public class SegmentDTO {
-		
-		/**
-		 * line -> part -> segment offset 0
-		 */
-		private short segmentIndex;
-		
-		/**
-		 * line -> part -> segment offset 1 or 2
-		 */
-		private short segmentLength;
 
-		/**
-		 * @return the segmentIndex
-		 */
-		public short getSegmentIndex() {
-			return segmentIndex;
-		}
-
-		/**
-		 * @param segmentIndex the segmentIndex to set
-		 */
-		public void setSegmentIndex(short segmentIndex) {
-			this.segmentIndex = segmentIndex;
-		}
-
-		/**
-		 * @return the segmentLength
-		 */
-		public short getSegmentLength() {
-			return segmentLength;
-		}
-
-		/**
-		 * @param segmentLength the segmentLength to set
-		 */
-		public void setSegmentLength(short segmentLength) {
-			this.segmentLength = segmentLength;
-		}
-		
+	@Override
+	public int getByteSize() {
+		return 12+(10*shortOverflowCount)+(numberParts*4);
 	}
 	
 }

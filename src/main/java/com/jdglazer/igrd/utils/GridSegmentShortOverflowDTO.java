@@ -4,11 +4,15 @@
  */
 package com.jdglazer.igrd.utils;
 
-public class GridSegmentShortOverflowDTO {
-	
-	private int segmentOffset;
+import java.nio.ByteBuffer;
+
+import com.jdglazer.igrd.IGRDCommonDTO;
+
+public class GridSegmentShortOverflowDTO extends IGRDCommonDTO {
 	
 	private int partOffset;
+	
+	private int segmentOffset;
 	
 	private short overflowIndex;
 	
@@ -24,7 +28,7 @@ public class GridSegmentShortOverflowDTO {
 	/**
 	 * @param segmentOffset the segmentOffset to set
 	 */
-	public void setSegmentOffset(int segmentOffset) {
+	public synchronized void setSegmentOffset(int segmentOffset) {
 		this.segmentOffset = segmentOffset;
 	}
 
@@ -38,7 +42,7 @@ public class GridSegmentShortOverflowDTO {
 	/**
 	 * @param overflowIndex the overflowIndex to set
 	 */
-	public void setOverflowIndex(short overflowIndex) {
+	public synchronized void setOverflowIndex(short overflowIndex) {
 		this.overflowIndex = overflowIndex;
 	}
 	
@@ -47,7 +51,7 @@ public class GridSegmentShortOverflowDTO {
 		return partOffset;
 	}
 
-	public void setPartOffset(int partOffset) {
+	public synchronized void setPartOffset(int partOffset) {
 		this.partOffset = partOffset;
 	}
 	/**
@@ -91,8 +95,25 @@ public class GridSegmentShortOverflowDTO {
 		return overflowValue;
 	}
 
-	public void setOverflowValue(short overflowValue) {
+	public synchronized void setOverflowValue(short overflowValue) {
 		this.overflowValue = overflowValue;
+	}
+
+	@Override
+	public synchronized ByteBuffer getByteBuffer() {
+		
+		ByteBuffer buffer = ByteBuffer.allocate(getByteSize());
+		
+		buffer.putInt(partOffset);
+		buffer.putInt(segmentOffset);
+		buffer.putShort(overflowIndex);
+		
+		return buffer;
+	}
+
+	@Override
+	public int getByteSize() {
+		return 10;
 	}
 	
 }

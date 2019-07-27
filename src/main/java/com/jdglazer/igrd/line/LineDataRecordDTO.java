@@ -1,6 +1,7 @@
 package com.jdglazer.igrd.line;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 import com.jdglazer.igrd.IGRDCommonDTO;
@@ -20,7 +21,7 @@ public class LineDataRecordDTO extends IGRDCommonDTO implements Serializable  {
 	private ArrayList<short[]> points = new ArrayList<short[]>();
 	
 	public LineDataRecordDTO( double minLat, double maxLat, double minLon, double maxLon ){
-		super( LineDataRecordDTO.class );
+		super();
 		minLat = this.minLat;
 		maxLat = this.maxLat;
 		minLon = this.minLon;
@@ -72,4 +73,17 @@ public class LineDataRecordDTO extends IGRDCommonDTO implements Serializable  {
 	public int getRecordLength() {
 		return 36 + getPointCount() * 30;
 	}
+
+	@Override
+	public ByteBuffer getByteBuffer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getByteSize() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
 }

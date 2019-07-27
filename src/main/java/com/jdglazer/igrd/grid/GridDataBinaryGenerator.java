@@ -4,8 +4,6 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
 
-import com.jdglazer.igrd.grid.GridDataLineDTO.PartDTO;
-import com.jdglazer.igrd.grid.GridDataLineDTO.SegmentDTO;
 import com.jdglazer.igrd.utils.GridSegmentShortOverflowDTO;
 
 public class GridDataBinaryGenerator {
@@ -37,13 +35,13 @@ public class GridDataBinaryGenerator {
 		
 		for( int k = 0; k < gridDataLineDTO.getNumberParts() ; k++ ) {
 			
-			PartDTO part = gridDataLineDTO.getPart( k );
+			GridDataLinePartDTO part = gridDataLineDTO.getPart( k );
 			append( getFloat( part.getStartLongitude() ), out );
 			append( getInt( part.getPointCount() ), out );
 			append( getInt( part.getSegmentCount() ), out );
 			
 			for( int l = 0; l < part.getSegmentCount() ; l++ ) {
-				SegmentDTO segment = part.getSegment(l);
+				GridDataLinePartSegmentDTO segment = part.getSegment(l);
 				if( gridDataLineDTO.getSegmentIndexType() == 2 ) {
 					append( getShort( segment.getSegmentIndex() ), out );
 				} else {
@@ -88,7 +86,7 @@ public class GridDataBinaryGenerator {
 		}
 	}
 	
-	private static int partByteLength ( PartDTO part, int indexLength ) {
+	private static int partByteLength ( GridDataLinePartDTO part, int indexLength ) {
 		return part.getSegmentCount()*(2 + indexLength) + 12;
 	}
 	
@@ -100,13 +98,13 @@ public class GridDataBinaryGenerator {
 		return out;
 	}
 	
-	private byte [] getDouble( double d ) {
+	private synchronized byte [] getDouble( double d ) {
 		synchronized( buffer8 ) {
 			return ((ByteBuffer)buffer8.clear()).putDouble(d).array();	
 		}
 	}
 	
-	private byte [] getFloat( float f ) {
+	private synchronized byte [] getFloat( float f ) {
 		synchronized( buffer4 ) {
 			return ((ByteBuffer)buffer4.clear()).putFloat(f).array();	
 		}

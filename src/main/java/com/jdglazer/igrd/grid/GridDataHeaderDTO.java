@@ -1,6 +1,7 @@
 package com.jdglazer.igrd.grid;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,7 +64,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	private Map<Integer, Integer> lineStartPositions = new HashMap<Integer, Integer>();
 	
 	public GridDataHeaderDTO() {
-		super(GridDataHeaderDTO.class);
+		super();
 	}
 	
 	/**
@@ -76,14 +77,14 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param minimumLatitude the minimumLatitude to set
 	 */
-	public void setMinimumLatitude(double minimumLatitude) {
+	public synchronized void setMinimumLatitude(double minimumLatitude) {
 		this.minimumLatitude = minimumLatitude;
 	}
 
 	/**
 	 * @return the minimumLongitude
 	 */
-	public double getMinimumLongitude() {
+	public synchronized double getMinimumLongitude() {
 		return minimumLongitude;
 	}
 
@@ -104,7 +105,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param maximumLatitude the maximumLatitude to set
 	 */
-	public void setMaximumLatitude(double maximumLatitude) {
+	public synchronized void setMaximumLatitude(double maximumLatitude) {
 		this.maximumLatitude = maximumLatitude;
 	}
 
@@ -118,7 +119,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param maximumLongitude the maximumLongitude to set
 	 */
-	public void setMaximumLongitude(double maximumLongitude) {
+	public synchronized void setMaximumLongitude(double maximumLongitude) {
 		this.maximumLongitude = maximumLongitude;
 	}
 
@@ -132,7 +133,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param latitudeInterval the latitudeInterval to set
 	 */
-	public void setLatitudeInterval(double latitudeInterval) {
+	public synchronized void setLatitudeInterval(double latitudeInterval) {
 		this.latitudeInterval = latitudeInterval;
 	}
 
@@ -146,7 +147,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param longitudeInterval the longitudeInterval to set
 	 */
-	public void setLongitudeInterval(double longitudeInterval) {
+	public synchronized void setLongitudeInterval(double longitudeInterval) {
 		this.longitudeInterval = longitudeInterval;
 	}
 
@@ -160,7 +161,7 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param latitudeLineCount the latitudeLineCount to set
 	 */
-	public void setLatitudeLineCount(int latitudeLineCount) {
+	public synchronized void setLatitudeLineCount(int latitudeLineCount) {
 		this.latitudeLineCount = latitudeLineCount;
 	}
 
@@ -174,16 +175,16 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 	/**
 	 * @param indexIdentifierType the indexIdentifierType to set
 	 */
-	public void setIndexIdentifierType(short indexIdentifierType) {
+	public synchronized void setIndexIdentifierType(short indexIdentifierType) {
 		this.indexIdentifierType = indexIdentifierType;
 	}
 	
-	public void setLineOffset( int lineIndex, int lineOffset ) {
-		this.lineStartPositions.put( new Integer( lineIndex ) , new Integer( lineOffset ) );
+	public synchronized void setLineOffset( int lineIndex, int lineOffset ) {
+		this.lineStartPositions.put( Integer.valueOf( lineIndex ) , Integer.valueOf( lineOffset ) );
 	}
 	
-	public Integer getLineOffset( int lineIndex ) {
-		return this.lineStartPositions.get( new Integer( lineIndex ) );
+	public synchronized Integer getLineOffset( int lineIndex ) {
+		return this.lineStartPositions.get( Integer.valueOf( lineIndex ) );
 	}
 	
 	/**
@@ -203,5 +204,28 @@ public class GridDataHeaderDTO extends IGRDCommonDTO implements Serializable {
 		}
 		
 		return true;
+	}
+
+	@Override
+	public synchronized ByteBuffer getByteBuffer() {
+		ByteBuffer buffer = ByteBuffer.allocate(getByteSize());
+		
+		buffer.putDouble(minimumLatitude);
+		buffer.putDouble(minimumLongitude);
+		buffer.putDouble(maximumLatitude);
+		buffer.putDouble(maximumLongitude);
+		buffer.putDouble(latitudeInterval);
+		buffer.putDouble(longitudeInterval);
+		buffer.putInt(latitudeLineCount);
+		buffer.putShort(indexIdentifierType);
+		
+		lineStartPositions.forEach( (index,offset) -> buffer.position(54+index*4).putInt(offset) );
+		
+		return buffer;
+	}
+
+	@Override
+	public int getByteSize() {
+		return 54+(latitudeLineCount*4);
 	}
 }

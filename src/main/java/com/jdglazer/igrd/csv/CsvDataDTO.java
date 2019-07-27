@@ -1,6 +1,7 @@
 package com.jdglazer.igrd.csv;
 
 import java.io.Serializable;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,7 +16,7 @@ public class CsvDataDTO extends IGRDCommonDTO implements Serializable {
 	private HashMap< Integer, ArrayList < String > > data = new HashMap< Integer, ArrayList < String > >();
 	
 	CsvDataDTO() {
-		super(CsvDataDTO.class);
+		super();
 	}
 	
 	public void addKey( String name ) {
@@ -41,5 +42,17 @@ public class CsvDataDTO extends IGRDCommonDTO implements Serializable {
 			//log invalid index error
 			return null;
 		}
+	}
+
+	@Override
+	public ByteBuffer getByteBuffer() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public int getByteSize() {
+		// TODO Auto-generated method stub
+		return 0;
 	}
 }

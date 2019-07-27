@@ -55,7 +55,7 @@ public class LineDataHeaderDTO implements Serializable {
 		
 		int previousOffset = recordOffsets.get( recordOffsets.size() - 1 );
 		
-		recordOffsets.add( new Integer( previousOffset + recordLength ) );
+		recordOffsets.add( Integer.valueOf( previousOffset + recordLength ) );
 	}
 	
 	public int getRecordOffset( int recordIndex ) {

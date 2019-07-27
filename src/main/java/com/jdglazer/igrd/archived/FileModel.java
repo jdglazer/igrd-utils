@@ -1,4 +1,4 @@
-package com.jdglazer.igrd.utils;
+package com.jdglazer.igrd.archived;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
@@ -7,12 +7,14 @@ import java.nio.channels.FileChannel.MapMode;
 import java.io.*;
 import java.util.*;
 
+import com.jdglazer.igrd.utils.InvalidFileTypeException;
+
 public class FileModel {
 
 // constant properties
-	protected static final String B_END = "b_end";
+	public static final int BIG_ENDIAN = 0;
 	
-	protected static final String L_END = "l_end";
+	public static final int LITTLE_ENDIAN = 1;
 	
 /**
  * File modes (either read or write)
@@ -62,10 +64,9 @@ public class FileModel {
 			
 		for( int m = 0; m < fis_add.length; m++ )  
 				
-			mapped_list[ m ] = fis_add[ m ].getChannel().map( MapMode.READ_ONLY, 0,  fis_add[ m ].getChannel().size() );
+			mapped_list[ m ] = fis_add[ m ].getChannel().map( MapMode.READ_ONLY, 0, fis_add[ m ].getChannel().size() );
 
 	}
-		
 
 /**
  * Constructor for using the object for writing to a file
@@ -87,8 +88,7 @@ public class FileModel {
  * A private constructor used for performing necessary instantiations in all public constructors
  * 
  */
-	
-	private FileModel() {
+   private FileModel() {
 		
 		pool_byteArray = new byte[50];
 		
@@ -118,12 +118,12 @@ public class FileModel {
  * @param order A string indicating the byte order (L_END for Little Endian or anything else for Big Endian
  * 
  */
-	private void setBuffer(String order) {
+	private void setBuffer(int order) {
 		
 		pool_ByteBuffer.rewind();
 		
 			
-		pool_ByteBuffer.order( order.equals( L_END ) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN );
+		pool_ByteBuffer.order( order == LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN );
 		
 		
 	}
@@ -186,13 +186,13 @@ public class FileModel {
  * Sets the read order of a specified random access file
  * 
  * @param mbbIndex The index (starting at 0) of the random access file to make changes to
- * @param order The read order (L_END or B_END)
+ * @param order The read order (LITTLE_ENDIAN or BIG_ENDIAN)
  * 
  */
 	
-	protected void readOrder( int mbbIndex, String order ){
+	protected void readOrder( int mbbIndex, int order ){
 		
-		mapped_list[ mbbIndex ].order(  order.equals(L_END) ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN ); 
+		mapped_list[ mbbIndex ].order( order == LITTLE_ENDIAN ? ByteOrder.LITTLE_ENDIAN : ByteOrder.BIG_ENDIAN ); 
 			
 	}
 	
@@ -206,7 +206,7 @@ public class FileModel {
  * @return Byte value at specified offset
  * 
  */
-	protected byte getByteFrom( short mbbIndex, String order, long offset ) {
+	protected synchronized byte getByteFrom( short mbbIndex, int order, long offset ) {
 		
 		readOrder( mbbIndex , order );
 		
@@ -224,7 +224,7 @@ public class FileModel {
  * 
  */
 	
-	protected short getShortFrom( short mbbIndex, String order, long offset ) {
+	protected synchronized short getShortFrom( short mbbIndex, int order, long offset ) {
 		
 		readOrder( mbbIndex , order );
 		
@@ -235,13 +235,13 @@ public class FileModel {
  * Gets either the Little or Big Endian integer from a specified position in one of the file input streams
  * 
  * @param fisIndex The index of the {@link FileInputStream} from which the file data is drawn
- * @param order Either L_END or B_END for Little Endian or Big Endian, respectively
+ * @param order Either LITTLE_ENDIAN or BIG_ENDIAN for Little Endian or Big Endian, respectively
  * @param offset The offset in the file from which to begin the read
  * @return Four byte integer at the specified offset
  * 
  */
 	
-	protected int getIntFrom( short mbbIndex, String order, long offset ) {
+	protected synchronized int getIntFrom( short mbbIndex, int order, long offset ) {
 		
 		readOrder( mbbIndex, order );
 		
@@ -254,20 +254,20 @@ public class FileModel {
  * Gets a long from a file 
  * 
  * @param mbbIndex The index of the random access file 
- * @param order The endian order (L_END or B_END)
+ * @param order The endian order (LITTLE_ENDIAN or BIG_ENDIAN)
  * @param offset The offset (in bytes) from the start of the file
  * @return A long value from a file
  * 
  */
 	
-	protected long getLongFrom( short mbbIndex, String order, long offset ) {
+	protected synchronized long getLongFrom( short mbbIndex, int order, long offset ) {
 		
 		readOrder( mbbIndex, order );
 		
 		return mapped_list[ mbbIndex ].getLong( (int) offset );
 	}
 
-	protected float getFloatFrom( short mbbIndex, String order, long offset ) {
+	protected synchronized float getFloatFrom( short mbbIndex, int order, long offset ) {
 		
 		readOrder( mbbIndex, order );
 		
@@ -277,14 +277,14 @@ public class FileModel {
  * Gets either the Little or Big Endian double from a specified position in one of the file input streams
  * 
  * @param fisIndex The index of the {@link FileInputStream} from which the data is drawn
- * @param order Either L_END or B_END for Little Endian or Big Endian, respectively
+ * @param order Either LITTLE_ENDIAN or BIG_ENDIAN for Little Endian or Big Endian, respectively
  * @param offset The offset in the file from which to begin the read
  * @return Eight byte double at the specified offset
  * @throws IOException
  * 
  */
 	
-	protected double getDoubleFrom( short mbbIndex, String order, long offset ) throws IOException {
+	protected synchronized double getDoubleFrom( short mbbIndex, int order, long offset ) throws IOException {
 		
 		readOrder( mbbIndex, order );
 		
@@ -332,7 +332,7 @@ public class FileModel {
  * A function to write an integer to a specified offset in a file output stream
  * 
  * @param rafIndex The index associated with the random access file
- * @param order The byte order. L_END for Little Endian and B_End for Big Endian
+ * @param order The byte order. LITTLE_ENDIAN for Little Endian and BIG_ENDIAN for Big Endian
  * @param offset The offset in the file write or overwrite
  * @param value The integer value to write to the file
  * @throws IOException

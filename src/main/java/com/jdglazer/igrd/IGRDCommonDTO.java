@@ -1,10 +1,11 @@
 package com.jdglazer.igrd;
 
+import java.nio.ByteBuffer;
+
 public abstract class IGRDCommonDTO {
 	
-	protected Class childClass;
+	public abstract ByteBuffer getByteBuffer();
 	
-	protected IGRDCommonDTO( Class child ) {
-		childClass = child;
-	}
+	public abstract int getByteSize();
+
 }
